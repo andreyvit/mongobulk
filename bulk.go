@@ -42,33 +42,60 @@ func New(collection *mgo.Collection, config Config) *Bulk {
 }
 
 func (b *Bulk) Insert(docs ...interface{}) {
-	b.prepare()
-	b.bulk.Insert(docs...)
+	for _, doc := range docs {
+		b.prepare()
+		b.bulk.Insert(doc)
+	}
 }
 
 func (b *Bulk) Remove(selectors ...interface{}) {
-	b.prepare()
-	b.bulk.Remove(selectors...)
+	for _, sel := range selectors {
+		b.prepare()
+		b.bulk.Remove(sel)
+	}
 }
 
 func (b *Bulk) RemoveAll(selectors ...interface{}) {
-	b.prepare()
-	b.bulk.RemoveAll(selectors...)
+	for _, sel := range selectors {
+		b.prepare()
+		b.bulk.RemoveAll(sel)
+	}
 }
 
 func (b *Bulk) Update(pairs ...interface{}) {
-	b.prepare()
-	b.bulk.Update(pairs...)
+	var last interface{}
+	for idx, doc := range pairs {
+		if idx%2 == 0 {
+			last = doc
+		} else {
+			b.prepare()
+			b.bulk.Update(last, doc)
+		}
+	}
 }
 
 func (b *Bulk) UpdateAll(pairs ...interface{}) {
-	b.prepare()
-	b.bulk.UpdateAll(pairs...)
+	var last interface{}
+	for idx, doc := range pairs {
+		if idx%2 == 0 {
+			last = doc
+		} else {
+			b.prepare()
+			b.bulk.UpdateAll(last, doc)
+		}
+	}
 }
 
 func (b *Bulk) Upsert(pairs ...interface{}) {
-	b.prepare()
-	b.bulk.Upsert(pairs...)
+	var last interface{}
+	for idx, doc := range pairs {
+		if idx%2 == 0 {
+			last = doc
+		} else {
+			b.prepare()
+			b.bulk.Upsert(last, doc)
+		}
+	}
 }
 
 func (b *Bulk) Finish() error {
